@@ -1,0 +1,104 @@
+version: 2
+
+models:
+  - name: stg_skus
+    description: Cleaned SKU master with typed numeric/boolean columns.
+    columns:
+      - name: sku_id
+        tests: [unique, not_null]
+      - name: abc_class
+        tests:
+          - not_null
+          - accepted_values: { values: ["A", "B", "C"] }
+      - name: unit_cost
+        tests: [not_null]
+      - name: selling_price
+        tests: [not_null]
+      - name: primary_vendor_id
+        tests: [not_null]
+
+  - name: stg_vendors
+    description: Cleaned vendor master.
+    columns:
+      - name: vendor_id
+        tests: [unique, not_null]
+      - name: contract_lead_time_days
+        tests: [not_null]
+      - name: defect_rate
+        tests: [not_null]
+
+  - name: stg_warehouses
+    description: Cleaned warehouse master.
+    columns:
+      - name: warehouse_id
+        tests: [unique, not_null]
+      - name: capacity_units
+        tests: [not_null]
+
+  - name: stg_demand_daily
+    description: Daily demand units per SKU x warehouse.
+    columns:
+      - name: demand_date
+        tests: [not_null]
+      - name: sku_id
+        tests: [not_null]
+      - name: warehouse_id
+        tests: [not_null]
+      - name: units_demanded
+        tests: [not_null]
+
+  - name: stg_orders
+    description: Customer orders with derived fulfillment_status.
+    columns:
+      - name: order_id
+        tests: [unique, not_null]
+      - name: fulfillment_status
+        tests:
+          - not_null
+          - accepted_values:
+              values: ["complete", "partial", "unfilled"]
+      - name: units_ordered
+        tests: [not_null]
+
+  - name: stg_inventory_snapshot
+    description: Weekly inventory snapshots with derived available_units.
+    columns:
+      - name: snapshot_date
+        tests: [not_null]
+      - name: sku_id
+        tests: [not_null]
+      - name: warehouse_id
+        tests: [not_null]
+
+  - name: stg_purchase_orders
+    description: POs with derived arrival_offset_days and arrival_status.
+    columns:
+      - name: po_id
+        tests: [unique, not_null]
+      - name: vendor_id
+        tests: [not_null]
+      - name: arrival_status
+        tests:
+          - not_null
+          - accepted_values:
+              values: ["on_time", "late"]
+
+  - name: stg_shipments
+    description: Outbound shipments with derived transit_days and delivery_offset_days.
+    columns:
+      - name: shipment_id
+        tests: [unique, not_null]
+      - name: order_id
+        tests: [not_null]
+
+  - name: stg_demand_forecast
+    description: Prophet forecast output (per SKU x warehouse). Tagged needs_forecast.
+    columns:
+      - name: forecast_date
+        tests: [not_null]
+      - name: sku_id
+        tests: [not_null]
+      - name: warehouse_id
+        tests: [not_null]
+      - name: forecast_units
+        tests: [not_null]

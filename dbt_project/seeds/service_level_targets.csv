@@ -1,0 +1,4 @@
+abc_class,target_service_level,stockout_penalty_per_unit
+A,0.98,12.50
+B,0.95,5.00
+C,0.90,2.00

@@ -1,0 +1,29 @@
+version: 2
+
+seeds:
+  - name: service_level_targets
+    description: Service-level + stockout penalty defaults by ABC class.
+    columns:
+      - name: abc_class
+        tests:
+          - unique
+          - not_null
+          - accepted_values:
+              values: ["A", "B", "C"]
+      - name: target_service_level
+        tests:
+          - not_null
+      - name: stockout_penalty_per_unit
+        tests:
+          - not_null
+
+  - name: stockout_cost_overrides
+    description: Per-SKU overrides where the default penalty is wrong (e.g., perishables).
+    columns:
+      - name: sku_id
+        tests:
+          - unique
+          - not_null
+      - name: stockout_penalty_per_unit
+        tests:
+          - not_null

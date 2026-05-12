@@ -1,0 +1,145 @@
+version: 2
+
+sources:
+  - name: raw
+    description: ERP-style supply chain extracts written to data/raw/ by the synthetic data generator.
+    meta:
+      external_location: "{{ env_var('DBT_EXTERNAL_ROOT', '../data/raw') }}/{name}.parquet"
+    tables:
+      - name: dim_skus
+        description: SKU master with category, costs, shelf life, ABC class, primary vendor.
+        columns:
+          - name: sku_id
+            description: Surrogate SKU identifier.
+            tests:
+              - unique
+              - not_null
+          - name: category
+            description: Top-level category (electronics, apparel, etc.).
+            tests:
+              - not_null
+          - name: unit_cost
+            tests:
+              - not_null
+          - name: selling_price
+            tests:
+              - not_null
+          - name: abc_class
+            tests:
+              - not_null
+              - accepted_values:
+                  values: ["A", "B", "C"]
+          - name: primary_vendor_id
+            tests:
+              - not_null
+
+      - name: dim_vendors
+        description: Vendor master with country, contracted lead time, defect rate.
+        columns:
+          - name: vendor_id
+            tests:
+              - unique
+              - not_null
+          - name: contract_lead_time_days
+            tests:
+              - not_null
+          - name: defect_rate
+            tests:
+              - not_null
+
+      - name: dim_warehouses
+        description: Warehouse master with region and capacity.
+        columns:
+          - name: warehouse_id
+            tests:
+              - unique
+              - not_null
+          - name: region
+            tests:
+              - not_null
+          - name: capacity_units
+            tests:
+              - not_null
+
+      - name: fact_demand_daily
+        description: Daily demand units per SKU x warehouse.
+        columns:
+          - name: demand_date
+            tests:
+              - not_null
+          - name: sku_id
+            tests:
+              - not_null
+          - name: warehouse_id
+            tests:
+              - not_null
+
+      - name: fact_orders
+        description: Customer orders with partial-fulfillment signal.
+        columns:
+          - name: order_id
+            tests:
+              - unique
+              - not_null
+          - name: sku_id
+            tests:
+              - not_null
+          - name: warehouse_id
+            tests:
+              - not_null
+
+      - name: fact_inventory_snapshot
+        description: Weekly on-hand + reserved + in-transit per SKU x warehouse.
+        columns:
+          - name: snapshot_date
+            tests:
+              - not_null
+          - name: sku_id
+            tests:
+              - not_null
+          - name: warehouse_id
+            tests:
+              - not_null
+
+      - name: fact_purchase_orders
+        description: Purchase orders to vendors with expected vs actual arrival dates.
+        columns:
+          - name: po_id
+            tests:
+              - unique
+              - not_null
+          - name: vendor_id
+            tests:
+              - not_null
+          - name: expected_arrival_date
+            tests:
+              - not_null
+
+      - name: fact_shipments
+        description: Outbound shipments to customers with promised/shipped/delivered dates.
+        columns:
+          - name: shipment_id
+            tests:
+              - unique
+              - not_null
+          - name: order_id
+            tests:
+              - not_null
+
+  - name: forecast
+    description: Prophet forecast outputs persisted by python/src/forecast.py.
+    meta:
+      external_location: "{{ env_var('DBT_FORECAST_ROOT', '../data/forecast') }}/{name}.parquet"
+    tables:
+      - name: fact_demand_forecast
+        description: SKU x warehouse demand forecast (yhat + bounds + run id).
+        columns:
+          - name: forecast_date
+            tests:
+              - not_null
+          - name: sku_id
+            tests:
+              - not_null
+          - name: warehouse_id
+            tests:
+              - not_null

@@ -1,0 +1,61 @@
+version: 2
+
+models:
+  - name: mart_inventory_health
+    description: Per (SKU, warehouse) inventory health, days of supply, stockout risk, slow-moving flag.
+    columns:
+      - name: sku_id
+        tests: [not_null]
+      - name: warehouse_id
+        tests: [not_null]
+      - name: stockout_risk_score
+        tests:
+          - not_null
+      - name: days_of_supply_30d
+        tests: [not_null]
+
+  - name: mart_otif
+    description: OTIF and fill-rate by warehouse x category x month.
+    columns:
+      - name: warehouse_id
+        tests: [not_null]
+      - name: ship_month
+        tests: [not_null]
+      - name: otif_rate
+        tests:
+          - not_null
+      - name: shipment_count
+        tests: [not_null]
+
+  - name: mart_vendor_scorecard
+    description: Per-vendor performance with composite score (0-100, lower is better).
+    columns:
+      - name: vendor_id
+        tests: [unique, not_null]
+      - name: composite_score
+        tests:
+          - not_null
+
+  - name: mart_warehouse_performance
+    description: Per-warehouse fulfillment KPIs over the trailing 90 days.
+    columns:
+      - name: warehouse_id
+        tests: [unique, not_null]
+
+  - name: mart_forecast_accuracy
+    description: Prophet forecast vs actuals MAPE/WAPE/bias per SKU x warehouse.
+    columns:
+      - name: sku_id
+        tests: [not_null]
+      - name: warehouse_id
+        tests: [not_null]
+
+  - name: mart_reorder_recommendations
+    description: Pre-optimization reorder signal (textbook formula); refined by python/src/optimization.py.
+    columns:
+      - name: sku_id
+        tests: [not_null]
+      - name: warehouse_id
+        tests: [not_null]
+      - name: needs_reorder
+        tests: [not_null]

@@ -1,0 +1,54 @@
+name: 'supply_chain_control_tower'
+version: '0.1.0'
+config-version: 2
+
+profile: 'supply_chain_control_tower'
+
+model-paths: ["models"]
+seed-paths: ["seeds"]
+test-paths: ["tests"]
+macro-paths: ["macros"]
+snapshot-paths: ["snapshots"]
+analysis-paths: ["analyses"]
+
+target-path: "target"
+clean-targets:
+  - "target"
+  - "dbt_packages"
+  - "logs"
+
+require-dbt-version: [">=1.8.0", "<1.10.0"]
+
+models:
+  supply_chain_control_tower:
+    staging:
+      +materialized: view
+      +schema: staging
+      stg_demand_forecast:
+        +tags: ["needs_forecast"]
+    intermediate:
+      +materialized: ephemeral
+    marts:
+      +materialized: table
+      +schema: marts
+      mart_forecast_accuracy:
+        +tags: ["needs_forecast"]
+      mart_reorder_recommendations:
+        +tags: ["needs_forecast"]
+
+snapshots:
+  supply_chain_control_tower:
+    +target_schema: snapshots
+
+seeds:
+  supply_chain_control_tower:
+    +schema: seeds
+    service_level_targets:
+      +column_types:
+        abc_class: varchar
+        target_service_level: double
+        stockout_penalty_per_unit: double
+    stockout_cost_overrides:
+      +column_types:
+        sku_id: varchar
+        stockout_penalty_per_unit: double

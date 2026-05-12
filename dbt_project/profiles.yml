@@ -1,0 +1,8 @@
+supply_chain_control_tower:
+  target: dev
+  outputs:
+    dev:
+      type: duckdb
+      path: ../data/supply.duckdb
+      threads: 4
+      external_root: ../data/raw

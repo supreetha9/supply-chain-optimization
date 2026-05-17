@@ -81,3 +81,5 @@ airflow/plugins/__pycache__/
 mlflow.db
 .env
 tmp_mlruns/
+data/sample/
+dbt_project/package-lock.yml

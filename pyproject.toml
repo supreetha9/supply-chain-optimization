@@ -21,8 +21,8 @@ dependencies = [
 
 [project.optional-dependencies]
 dbt = [
-    "dbt-core>=1.8,<1.10",
-    "dbt-duckdb>=1.8,<1.10",
+    "dbt-core>=1.8,<1.12",
+    "dbt-duckdb>=1.8,<1.11",
 ]
 dev = [
     "pytest>=8.2",
